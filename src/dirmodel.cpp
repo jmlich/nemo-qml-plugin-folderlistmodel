@@ -29,6 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
+#include <QRegularExpression>
 #include <QDirIterator>
 #include <QDir>
 #include <QDebug>
@@ -291,12 +292,12 @@ void DirModel::onItemsAdded(const QVector<QFileInfo> &newFiles)
 
         foreach (const QString &nameFilter, mNameFilters) {
             // TODO: using QRegExp for wildcard matching is slow
-            QRegExp re(nameFilter, Qt::CaseInsensitive, QRegExp::Wildcard);
-            bool matched = re.exactMatch(fi.fileName());
-            if (mFilterMode == Inclusive && matched) {
+            QRegularExpression re(nameFilter, QRegularExpression::CaseInsensitiveOption);
+            QRegularExpressionMatch match = re.match(fi.fileName());
+            if (mFilterMode == Inclusive && match.hasMatch()) {
                 doAdd = true;
                 break;
-            } else if (mFilterMode == Exclusive && !matched) {
+            } else if (mFilterMode == Exclusive && !match.hasMatch()) {
                 doAdd = false;
                 break;
             }
@@ -305,7 +306,7 @@ void DirModel::onItemsAdded(const QVector<QFileInfo> &newFiles)
         if (!doAdd)
             continue;
 
-        QVector<QFileInfo>::Iterator it = qLowerBound(mDirectoryContents.begin(),
+        QVector<QFileInfo>::Iterator it = std::lower_bound(mDirectoryContents.begin(),
                                                       mDirectoryContents.end(),
                                                       fi,
                                                       fileCompare);
