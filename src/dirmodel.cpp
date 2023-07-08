@@ -106,7 +106,7 @@ DirModel::DirModel(QObject *parent)
     , mAwaitingResults(false)
     , mShowHiddenFiles(false)
 {
-    mNameFilters = QStringList() << "*";
+    mNameFilters = QStringList() << ".*";
 
 }
 
