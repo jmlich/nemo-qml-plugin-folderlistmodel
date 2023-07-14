@@ -106,7 +106,7 @@ DirModel::DirModel(QObject *parent)
     , mAwaitingResults(false)
     , mShowHiddenFiles(false)
 {
-    mNameFilters = QStringList() << ".*";
+    mNameFilters = QStringList() << "*";
 
 }
 
@@ -292,7 +292,8 @@ void DirModel::onItemsAdded(const QVector<QFileInfo> &newFiles)
 
         foreach (const QString &nameFilter, mNameFilters) {
             // TODO: using QRegExp for wildcard matching is slow
-            QRegularExpression re(nameFilter, QRegularExpression::CaseInsensitiveOption);
+            QRegularExpression re(QRegularExpression::wildcardToRegularExpression(nameFilter), QRegularExpression::CaseInsensitiveOption);
+
             QRegularExpressionMatch match = re.match(fi.fileName());
             if (mFilterMode == Inclusive && match.hasMatch()) {
                 doAdd = true;
